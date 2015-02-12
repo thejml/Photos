@@ -4,10 +4,11 @@ require("includes/exifReader.inc");
 require("vendor/autoload.php");
 
 class ImageBase {
-	protected $fileEXIF = array(); //Contains EXIF data
-	protected $fileName = "";
-	protected $config = array();
-	
+	protected $fileEXIF 	= array(); //Contains EXIF data
+	protected $fileName 	= "";
+	protected $config 	= array();
+	protected $tags		= array();	
+
 	protected $elasticsearchParams=array();
 	protected $esClient = null;
 
@@ -51,16 +52,37 @@ class ImageBase {
 		// Load data from the file for operations
 	}
 
+	function addTags($tags) { 
+		foreach ($tags as $tag=>$value) {
+			$this->tags[$value]=1;
+		}
+	}
+
+	function delTags($tags) {
+		foreach ($tags as $tag=>$value) { 
+			unset($this->tags[$value]);
+		}
+	}
+
+	function renderTags() {
+		$output=array();
+		foreach($this->tags as $tag=>$value) { 
+			$output[]=$tag;
+		}
+		return $output;
+	}
+
 	/**
 	 * Update ElasticSearch with the EXIF and sha info from the file.
   	 */
 	function updateES() {
-		$params = array();
+		$params 	 = array();
     		$params['body']  = $this->fileEXIF;   
+		$params['body']['tags'] = $this->renderTags();
 		$params['index'] = 'photos';
     		$params['type']  = 'name';
     		$params['id']    = $this->fileEXIF['sha'];
-    		$ret = $this->esClient->index($params);
+    		$ret 		 = $this->esClient->index($params);
 	}
 }	
 
