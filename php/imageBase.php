@@ -23,19 +23,53 @@ class ImageBase {
 		$this->loadEXIF();
 	}
 
+	function fractionToDecimal($str) { 
+		$dex=explode("/",$str); 
+		return ($dex[0]/$dex[1]);
+	}
+
 	/**
 	* Create an object, then process the file. We don't want the thumbnail (it's tiny), save the rest.
 	*/
 	function loadEXIF() {
 		$sha1 = sha1_file($this->fileName);
-		$er = new phpExifReader($this->fileName);
-		$er->processFile();
-		$this->fileEXIF=$er->getImageInfo();
-		// The built in Thumbnail is too small for our use, so let's get rid of it. In fact, let's clear up some other things...
-		$cleanUp=array('Thumbnail','ThumbnailSize','flashpixVersion','subSectionTimeOriginal','subSectionTimeDigtized','FileName');
-		foreach ($cleanUp as $clean) { 
-			unset($this->fileEXIF[$clean]);
+//		$er = new phpExifReader($this->fileName);
+//		$er->processFile();
+//		$this->fileEXIF=$er->getImageInfo();
+		$EXIF=exif_read_data($this->fileName);
+		$desiredEXIFAttributes=array("FileName","FileDateTime","FileSize","MimeType","Make","Model","Orientation","XResolution","YResolution","ResolutionUnit","Software","DateTime","ExposureTime","FNumber","ExposureProgram","ISOSpeedRatings","DateTimeOriginal","DateTimeDigitized","ShutterSpeedValue","ApertureValue","BrightnessValue","MeteringMode","Flash","FocalLength","ColorSpace","ExifImageWidth","ExifImageLength","ExposureMode","WhiteBalance","GPSLatitudeRef","GPSLatitude","GPSLongitudeRef","GPSLongitude","GPSAltitudeRef","GPSAltitude","GPSTimeStamp","GPSImgDirectionRef","GPSImgDirection");
+		$divisibleEXIFAttributes=array("XResolution","YResolution","ExposureTime","FNumber","ShutterSpeedValue","ApertureValue","BrightnessValue","FocalLength","GPSAltitude","GPSImgDirection");
+		$geoDataEXIFAttributes=array("GPSLatitude"=>"lat","GPSLongitude"=>"lon","GPSTimeStamp"=>"GPSTime");
+
+		// We only care about what's listed in the $desiredEXIFAttributes array. Just copy those over.
+		foreach ($desiredEXIFAttributes as $desired) { $this->fileEXIF[$desired]=(isset($EXIF[$desired])?$EXIF[$desired]:FALSE); }
+
+		// There are a number of things returned as functions, let's make them decimals for ease of use
+		foreach ($divisibleEXIFAttributes as $div) { 
+			$this->fileEXIF[$div]=$this->fractionToDecimal($this->fileEXIF[$div]);
 		}
+
+		// For GeoData, let's convert the 3 part return array to a decimal number
+		foreach ($geoDataEXIFAttributes as $gda => $name) { 
+			$this->fileEXIF[$gda][0]=$this->fractionToDecimal($this->fileEXIF[$gda][0]);
+			$this->fileEXIF[$gda][1]=$this->fractionToDecimal($this->fileEXIF[$gda][1]);
+			$this->fileEXIF[$gda][2]=$this->fractionToDecimal($this->fileEXIF[$gda][2]);
+			$this->fileEXIF['location'][$name]=$this->fileEXIF[$gda][0]+($this->fileEXIF[$gda][1]/60)+($this->fileEXIF[$gda][2]/3600);
+		}
+		// North is Plus, South is Minus.
+		if (isset($this->fileEXIF["GPSLatitudeRef"]) && ($this->fileEXIF["GPSLatitudeRef"]=='N')) { 
+			$this->fileEXIF["location"]['lat']=abs($this->fileEXIF["location"]['lat']);
+		} else { $this->fileEXIF["location"]['lat']=-1*abs($this->fileEXIF["location"]['lat']); }
+
+		// East is Plus, West is Minus
+		if (isset($this->fileEXIF["GPSLongitudeRef"]) && ($this->fileEXIF["GPSLongitudeRef"]=='E')) { 
+			$this->fileEXIF["location"]['lon']=abs($this->fileEXIF["location"]['lon']);
+		} else { $this->fileEXIF["location"]['lon']=-1*abs($this->fileEXIF["location"]['lon']); }
+		// The built in Thumbnail is too small for our use, so let's get rid of it. In fact, let's clear up some other things...
+		//$cleanUp=array('Thumbnail','ThumbnailSize','flashpixVersion','subSectionTimeOriginal','subSectionTimeDigtized','FileName');
+		//foreach ($cleanUp as $clean) { 
+		//	unset($this->fileEXIF[$clean]);
+		//}
 		$this->fileEXIF['lastUpdate']=ceil(microtime(true)*1000);
 		$this->fileEXIF['sha']=$sha1;
 	} 
@@ -85,4 +119,5 @@ class ImageBase {
     		$ret 		 = $this->esClient->index($params);
 	}
 }	
+
 
