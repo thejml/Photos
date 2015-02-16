@@ -49,12 +49,18 @@ class ImageBase {
 			$this->fileEXIF[$div]=$this->fractionToDecimal($this->fileEXIF[$div]);
 		}
 
-		// For GeoData, let's convert the 3 part return array to a decimal number
+		$this->fileEXIF['Model']	= str_replace(" ","_",$this->fileEXIF['Model']);
+		$this->fileEXIF['Make']		= str_replace(" ","_",$this->fileEXIF['Make']);
+		$this->fileEXIF['DateTime']	= date("Ymd\THisO",strtotime($this->fileEXIF['DateTime']));
+ 
+		// For/if GeoData, let's convert the 3 part return array to a decimal number
 		foreach ($geoDataEXIFAttributes as $gda => $name) { 
-			$this->fileEXIF[$gda][0]=$this->fractionToDecimal($this->fileEXIF[$gda][0]);
-			$this->fileEXIF[$gda][1]=$this->fractionToDecimal($this->fileEXIF[$gda][1]);
-			$this->fileEXIF[$gda][2]=$this->fractionToDecimal($this->fileEXIF[$gda][2]);
-			$this->fileEXIF['location'][$name]=$this->fileEXIF[$gda][0]+($this->fileEXIF[$gda][1]/60)+($this->fileEXIF[$gda][2]/3600);
+			if (isset($this->fileEXIF[$gda])) { 
+				$this->fileEXIF[$gda][0]=$this->fractionToDecimal($this->fileEXIF[$gda][0]);
+				$this->fileEXIF[$gda][1]=$this->fractionToDecimal($this->fileEXIF[$gda][1]);
+				$this->fileEXIF[$gda][2]=$this->fractionToDecimal($this->fileEXIF[$gda][2]);
+				$this->fileEXIF['location'][$name]=$this->fileEXIF[$gda][0]+($this->fileEXIF[$gda][1]/60)+($this->fileEXIF[$gda][2]/3600);
+			}
 		}
 		// North is Plus, South is Minus.
 		if (isset($this->fileEXIF["GPSLatitudeRef"]) && ($this->fileEXIF["GPSLatitudeRef"]=='N')) { 
