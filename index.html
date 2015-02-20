@@ -25,6 +25,25 @@
 
     <!-- Custom styles for this template -->
     <link href="css/carousel.css" rel="stylesheet">
+
+    <style type="text/css"> html, body, #map-canvas { height: 100%; margin: 0; padding: 0;} </style>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyALs9EZiU5nD814Ct1i_tkD_elausWFbHI"></script>
+    <script type="text/javascript">
+      function initialize() {
+        var mapOptions = {
+          center: { lat: 37, lng: -76.3},
+          zoom: 10
+        };
+        var map = new google.maps.Map(document.getElementById('map-canvas'),
+            mapOptions);
+	var myLatlng = new google.maps.LatLng(36.8186,-76.24);
+	var myLatlng2= new google.maps.LatLng(37.31,-76.73);
+	var marker = new google.maps.Marker({position: myLatlng, map: map, title:"Hello From Over Here Too!"});
+	var marker2 = new google.maps.Marker({position: myLatlng2, map: map, title:"Hello From Here!"});
+      }
+      google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+
   </head>
 <!-- NAVBAR
 ================================================== -->
@@ -141,9 +160,8 @@
           <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
         </div><!-- /.col-lg-4 -->
         <div class="col-lg-4">
-          <img class="img-circle" src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="Generic placeholder image" style="width: 140px; height: 140px;">
-          <h2>Heading</h2>
-          <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+ 	  <div id="map-canvas" style='height:245px;'></div>
+          <h2>Photo Locations</h2>
           <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
         </div><!-- /.col-lg-4 -->
       </div><!-- /.row -->
