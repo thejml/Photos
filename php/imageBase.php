@@ -39,7 +39,7 @@ class ImageBase {
 		$EXIF=exif_read_data($this->fileName);
 		$desiredEXIFAttributes=array("FileName","FileDateTime","FileSize","MimeType","Make","Model","Orientation","XResolution","YResolution","ResolutionUnit","Software","DateTime","ExposureTime","FNumber","ExposureProgram","ISOSpeedRatings","DateTimeOriginal","DateTimeDigitized","ShutterSpeedValue","ApertureValue","BrightnessValue","MeteringMode","Flash","FocalLength","ColorSpace","ExifImageWidth","ExifImageLength","ExposureMode","WhiteBalance","GPSLatitudeRef","GPSLatitude","GPSLongitudeRef","GPSLongitude","GPSAltitudeRef","GPSAltitude","GPSTimeStamp","GPSImgDirectionRef","GPSImgDirection");
 		$divisibleEXIFAttributes=array("XResolution","YResolution","ExposureTime","FNumber","ShutterSpeedValue","ApertureValue","BrightnessValue","FocalLength","GPSAltitude","GPSImgDirection");
-		$geoDataEXIFAttributes=array("GPSLatitude"=>"lat","GPSLongitude"=>"lon","GPSTimeStamp"=>"GPSTime");
+		$geoDataEXIFAttributes=array("GPSLatitude"=>"lat","GPSLongitude"=>"lon"); //,"GPSTimeStamp"=>"GPSTime");
 
 		// We only care about what's listed in the $desiredEXIFAttributes array. Just copy those over.
 		foreach ($desiredEXIFAttributes as $desired) { 
@@ -79,6 +79,13 @@ class ImageBase {
 			if (isset($this->fileEXIF["GPSLongitudeRef"]) && ($this->fileEXIF["GPSLongitudeRef"]=='E')) { 
 				$this->fileEXIF["location"]['lon']=abs($this->fileEXIF["location"]['lon']);
 			} else { $this->fileEXIF["location"]['lon']=-1*abs($this->fileEXIF["location"]['lon']); }
+			$this->fileEXIF["location"]=array(round($this->fileEXIF["location"]["lat"],4),round($this->fileEXIF["location"]["lon"],2));
+			//Clean up unused indexes
+			unset($this->fileEXIF["GPSLatitudeRef"]);
+			unset($this->fileEXIF["GPSLatitude"]);
+			unset($this->fileEXIF["GPSLongitudeRef"]);
+			unset($this->fileEXIF["GPSLongitude"]);
+			unset($this->fileEXIF["GPSTimeStamp"]);
 		}
 		// The built in Thumbnail is too small for our use, so let's get rid of it. In fact, let's clear up some other things...
 		//$cleanUp=array('Thumbnail','ThumbnailSize','flashpixVersion','subSectionTimeOriginal','subSectionTimeDigtized','FileName');
