@@ -57,7 +57,7 @@ class ImageBase {
 
 		$this->fileEXIF['Model']	= str_replace(" ","_",$this->fileEXIF['Model']);
 		$this->fileEXIF['Make']		= str_replace(" ","_",$this->fileEXIF['Make']);
-		$this->fileEXIF['DateTime']	= date("Ymd\THisO",strtotime($this->fileEXIF['DateTime']));
+		$this->fileEXIF['DateTime']	= date("Y-m-d\TH:i:s.000\Z",strtotime($this->fileEXIF['DateTime']));
  
 		// For/if GeoData, let's convert the 3 part return array to a decimal number
 		foreach ($geoDataEXIFAttributes as $gda => $name) { 
