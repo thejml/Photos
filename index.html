@@ -28,21 +28,6 @@
 
     <style type="text/css"> html, body, #map-canvas { height: 100%; margin: 0; padding: 0;} </style>
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyALs9EZiU5nD814Ct1i_tkD_elausWFbHI"></script>
-    <script type="text/javascript">
-      function initialize() {
-        var mapOptions = {
-          center: { lat: 37, lng: -76.3},
-          zoom: 10
-        };
-        var map = new google.maps.Map(document.getElementById('map-canvas'),
-            mapOptions);
-	var myLatlng = new google.maps.LatLng(36.8186,-76.24);
-	var myLatlng2= new google.maps.LatLng(37.31,-76.73);
-	var marker = new google.maps.Marker({position: myLatlng, map: map, title:"Hello From Over Here Too!"});
-	var marker2 = new google.maps.Marker({position: myLatlng2, map: map, title:"Hello From Here!"});
-      }
-      google.maps.event.addDomListener(window, 'load', initialize);
-    </script>
 
   </head>
 <!-- NAVBAR
@@ -149,9 +134,8 @@
       <!-- Three columns of text below the carousel -->
       <div class="row">
         <div class="col-lg-4">
-          <img class="img-circle" src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="Generic placeholder image" style="width: 140px; height: 140px;">
-          <h2>Heading</h2>
-          <p>Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh ultricies vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Praesent commodo cursus magna.</p>
+	  <canvas id="activityChart" width="245" height="245"></canvas>
+          <h2>Activity Histogram</h2>
           <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
         </div><!-- /.col-lg-4 -->
         <div class="col-lg-4">
@@ -229,31 +213,29 @@
     <script src="js/ie10-viewport-bug-workaround.js"></script>
     <script src="js/Chart.js"></script>
     <script src="js/Photos.js"></script>
-    <script> loadData();
-	var data = [
-    {
-        value: 300,
-        color:"#F7464A",
-        highlight: "#FF5A5E",
-        label: "Red"
-    },
-    {
-        value: 50,
-        color: "#46BFBD",
-        highlight: "#5AD3D1",
-        label: "Green"
-    },
-    {
-        value: 100,
-        color: "#FDB45C",
-        highlight: "#FFC870",
-        label: "Yellow"
-    }
-]
+    <script> 
+	loadDeviceChart();
+	loadActivityChart();
 	// Get context with jQuery - using jQuery's .get() method.
 //	var ctx = $("#deviceChart").get(0).getContext("2d");
 	// This will get the first returned node in the jQuery collection.
 //	var deviceChartObject = new Chart(ctx).Doughnut(data);
+    </script>
+    <script type="text/javascript">
+//      function initialize() {
+//        var mapOptions = {
+//          center: { lat: 37, lng: -76.3},
+//          zoom: 10
+//        };
+//        var map = new google.maps.Map(document.getElementById('map-canvas'),
+//            mapOptions);
+//	var myLatlng = new google.maps.LatLng(36.8186,-76.24);
+//	var myLatlng2= new google.maps.LatLng(37.31,-76.73);
+//	var marker = new google.maps.Marker({position: myLatlng, map: map, title:"Hello From Over Here Too!"});
+//	var marker2 = new google.maps.Marker({position: myLatlng2, map: map, title:"Hello From Here!"});
+//     }
+//      google.maps.event.addDomListener(window, 'load', initialize);
+	googleMapLocation();
     </script>
   </body>
 </html>
