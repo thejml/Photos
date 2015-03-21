@@ -5,6 +5,14 @@ var geoLocationQuery = { from:0, size:20, query: { filtered: { query: {match_all
 var esLastFileDateQuery = { sort : [ { "FileDateTime" : "desc" }, "_score"] };
 var elasticsearchServerURL = "http://elasticsearch-thejml.rhcloud.com/photos/";
 
+/* Orientation 
+ * Value   Means	Value	Means
+ *   8      90   	  6     270
+ *   3     180		  1       0  */
+function orientationToDeg(o) {
+	if (o==1) { return '000'; } else if (o==3) { return '180'; } else if (o==6) { return '270'; } else if (o==8) { return '090'; }
+} 
+
 function gMapInitialize() {
 	var mapOptions = { center: { lat: 37, lng: -76.3}, zoom: 7 };
 	var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
@@ -124,7 +132,7 @@ function latestPhotoList() {
                 var output = [];
                 var temp = [];
 		var labelText = [];
-		var agg=response.hits.hits; alert(JSON.stringify(response.hits));
+		var agg=response.hits.hits; 
                 if (agg.length > 0) {
                     for (var i = 0; i < agg.length; i++) {
 			output[i] = agg[i]._id;
@@ -151,11 +159,11 @@ function linePhotoList(divid) {
                 var output = [];
                 var temp = "";
 		var labelText = [];
-		var agg=response.hits.hits; alert(JSON.stringify(response.hits));
+		var agg=response.hits.hits; 
                 if (agg.length > 0) {
                     for (var i = 0; i < agg.length; i++) {
 			temp = agg[i]._id;
-			$('<div class="row featurette">').html('<div class="col-md-5"><img class="featurette-image img-responsive" src="http://imgs.thejml.info:789/'+temp.slice(0,2)+'/'+temp+'02500250000.jpg" alt="Generic placeholder image"></div></div>').appendTo(divid);
+			$('<div class="row featurette">').html('<div class="col-md-3 listview"><img class="featurette-image img-responsive" src="http://imgs.thejml.info:789/'+temp.slice(0,2)+'/'+temp+'02500250'+orientationToDeg(agg[i]._source.Orientation)+'.jpg" alt="Generic placeholder image"></div></div>').appendTo(divid);
                     }
                 }
             },
