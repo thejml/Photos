@@ -1,6 +1,8 @@
 var esDeviceDataQuery = { aggs: { makes: { terms: { field: "Model" } } }, }; 
-var esActivityDataQuery = { aggs: { time: { date_histogram: { field: "DateTime", "interval": "week", "min_doc_count":0} }}}; 
-var geoLocationQuery = { query: { filtered: { query: {match_all : {}}, filter: { "geo_distance": { "distance": "200km", "location" : [37.31,-76.73] } } } } };
+var esActivityDataQuery = { aggs: { time: { date_histogram: { field: "DateTime", "interval": "month", "min_doc_count":0} }}}; 
+//var geoLocationQuery = { query: { filtered: { query: {match_all : {}}, filter: { "geo_distance": { "distance": "200km", "location" : [37.31,-76.73] } } } } };
+var geoLocationQuery = { from:0, size:20, query: { filtered: { query: {match_all : {}}, filter: { "geo_distance": { "distance": "200km", "location" : [37.31,-76.73] } } } } };
+var esLastFileDateQuery = { sort : [ { "FileDateTime" : "desc" }, "_score"] };
 var elasticsearchServerURL = "http://elasticsearch-thejml.rhcloud.com/photos/";
 
 function gMapInitialize() {
@@ -54,6 +56,7 @@ function loadDeviceChart() {
 			value = agg[i].doc_count;
                         output[i]={'label':label,'value':value,'highlight':highlight[i],'color':colors[i]};
                     }
+		    Chart.defaults.global.animation=false;
         	    // Get context with jQuery - using jQuery's .get() method.
         	    var ctx = $("#deviceChart").get(0).getContext("2d");
         	    // This will get the first returned node in the jQuery collection.
@@ -99,8 +102,62 @@ function loadActivityChart() {
         	    // Get context with jQuery - using jQuery's .get() method.
         	    var ctx = $("#activityChart").get(0).getContext("2d");
         	    // This will get the first returned node in the jQuery collection.
-        	    var deviceChartObject = new Chart(ctx).Line(output,{ bezierCurve: true });
+        	    var deviceChartObject = new Chart(ctx).Line(output,{ bezierCurve: false, showToolTips: false, pointHitDetectionRadius: 2,scaleShowGridLines: false, pointDot: false });
                 } 
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                var jso = jQuery.parseJSON(jqXHR.responseText);
+                error_note('section', 'error', '(' + jqXHR.status + ') ' + errorThrown + ' --<br />' + jso.error);
+            }
+        });
+};
+
+function latestPhotoList() {
+
+	$.ajax({url: elasticsearchServerURL+'_search?search_type=count',
+            type: 'POST',
+            //contentType: 'application/json; charset=UTF-8',
+            crossDomain: true,
+            dataType: 'json',
+            data: JSON.stringify(esLastFileDateQuery),
+            success: function(response) {
+                var output = [];
+                var temp = [];
+		var labelText = [];
+		var agg=response.hits.hits; alert(JSON.stringify(response.hits));
+                if (agg.length > 0) {
+                    for (var i = 0; i < agg.length; i++) {
+			output[i] = agg[i]._id;
+			alert(agg[i]._id);
+                    }
+                }
+		return output; 
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                var jso = jQuery.parseJSON(jqXHR.responseText);
+                error_note('section', 'error', '(' + jqXHR.status + ') ' + errorThrown + ' --<br />' + jso.error);
+            }
+        });
+};
+
+function linePhotoList(divid) {
+	$.ajax({url: elasticsearchServerURL+'_search',
+            type: 'POST',
+            //contentType: 'application/json; charset=UTF-8',
+            crossDomain: true,
+            dataType: 'json',
+            data: JSON.stringify(geoLocationQuery),
+            success: function(response) {
+                var output = [];
+                var temp = "";
+		var labelText = [];
+		var agg=response.hits.hits; alert(JSON.stringify(response.hits));
+                if (agg.length > 0) {
+                    for (var i = 0; i < agg.length; i++) {
+			temp = agg[i]._id;
+			$('<div class="row featurette">').html('<div class="col-md-5"><img class="featurette-image img-responsive" src="http://imgs.thejml.info:789/'+temp.slice(0,2)+'/'+temp+'02500250000.jpg" alt="Generic placeholder image"></div></div>').appendTo(divid);
+                    }
+                }
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 var jso = jQuery.parseJSON(jqXHR.responseText);

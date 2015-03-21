@@ -29,7 +29,7 @@
  * Source Directory: $sourceDir
  * Requested File (with resize options): $out
  */
-function generateImage($name, $ext, $sourceDir, $targetDir, $out, $width, $height) {
+function generateImage($name, $ext, $sourceDir, $targetDir, $out, $width, $height, $rotation=0) {
 //	echo "Going to rescale ".$name.".".$ext." to be ".$width."px wide and ".$height."px high, and save it to ".$targetDir.$out." using ".$sourceDir.$name.".".$ext." as the source.\n";
 	$quality=85;
 	$targetFile=$targetDir.$out;
@@ -39,6 +39,8 @@ function generateImage($name, $ext, $sourceDir, $targetDir, $out, $width, $heigh
 		case 'jpeg':
 			$image=imagecreatefromjpeg($sourceDir.$name.'.'.$ext);
 	}
+
+	if ($rotation!=0) { $image=imagerotate($image,$rotation,0); }
 
 	$actualHeight	= imagesy($image);
 	$actualWidth	= imagesx($image);
@@ -89,18 +91,19 @@ function generateImage($name, $ext, $sourceDir, $targetDir, $out, $width, $heigh
 
 
 	$requestedFile	=	$_SERVER['SCRIPT_NAME'];
-	if (preg_match('/^\/([a-fA-F0-9]+)\/([a-fA-F0-9]+)([0-9]{4})([0-9]{4}).([a-zA-Z]+)/', $requestedFile,$matches) ) {
+	if (preg_match('/^\/([a-fA-F0-9]+)\/([a-fA-F0-9]+)([0-9]{4})([0-9]{4})([0-9]{3}).([a-zA-Z]+)/', $requestedFile,$matches) ) {
 		$dir 	= $matches[1];
 		$name	= $matches[2];
 		$width	= intval($matches[3]);
 		$height = intval($matches[4]);
-		$ext	= $matches[5];
+		$rotate	= intval($matches[5]);
+		$ext	= $matches[6];
 
 		$root	= $_SERVER['DOCUMENT_ROOT'];
 		$originalPathEX = explode('/',$root);
 		unset($originalPathEX[count($originalPathEX)-2]);
 		$originalPath = implode('/',$originalPathEX);
-		generateImage($name,$ext,$originalPath.$dir.'/',$root,trim($requestedFile,'/'),$width,$height);
+		generateImage($name,$ext,$originalPath.$dir.'/',$root,trim($requestedFile,'/'),$width,$height,$rotate);
 	} else {
 		header("HTTP/1.0 400 Bad Request"); 
 		echo "Sorry, I don't understand your request for ".$requestedFile;
