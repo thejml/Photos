@@ -163,7 +163,7 @@ function linePhotoList(divid) {
                 if (agg.length > 0) {
                     for (var i = 0; i < agg.length; i++) {
 			temp = agg[i]._id;
-			$('<div class="row featurette">').html('<div class="col-md-3 listview"><img class="featurette-image img-responsive" src="http://imgs.thejml.info:789/'+temp.slice(0,2)+'/'+temp+'02500250'+orientationToDeg(agg[i]._source.Orientation)+'.jpg" alt="Generic placeholder image"></div></div>').appendTo(divid);
+			$('<div class="thumbnails">').html('<img class="thumbnail_small" src="http://imgs.thejml.info:789/'+temp.slice(0,2)+'/'+temp+'01600160'+orientationToDeg(agg[i]._source.Orientation)+'.jpg" alt="Generic placeholder image"></div></div>').appendTo(divid);
                     }
                 }
             },
