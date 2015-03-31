@@ -5,6 +5,10 @@ var geoLocationQuery = { from:0, size:20, query: { filtered: { query: {match_all
 var esLastFileDateQuery = { sort : [ { "FileDateTime" : "desc" }, "_score"] };
 var elasticsearchServerURL = "http://elasticsearch-thejml.rhcloud.com/photos/";
 
+// These function should be updated for your location
+function webroot() { return "http://src.thejml.info:789/photos/"; }
+function imagehost() { return "http://images.thejml.info:789/"; }
+
 /* Orientation 
  * Value   Means	Value	Means
  *   8      90   	  6     270
@@ -163,7 +167,7 @@ function linePhotoList(divid) {
                 if (agg.length > 0) {
                     for (var i = 0; i < agg.length; i++) {
 			temp = agg[i]._id;
-			$('<div class="thumbnails">').html('<img class="thumbnail_small" src="http://imgs.thejml.info:789/'+temp.slice(0,2)+'/'+temp+'01600160'+orientationToDeg(agg[i]._source.Orientation)+'.jpg" alt="Generic placeholder image"></div></div>').appendTo(divid);
+			$('<div class="thumbnails">').html('<a href="'+webroot()+'/view.html?id='+temp+'"><img class="thumbnail_small" src="'+imagehost()+'/'+temp.slice(0,2)+'/'+temp+'01600160'+orientationToDeg(agg[i]._source.Orientation)+'.jpg" alt="Generic placeholder image"></a></div></div>').appendTo(divid);
                     }
                 }
             },
