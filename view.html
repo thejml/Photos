@@ -56,18 +56,17 @@
     </div>
 
 
-    <!-- Marketing messaging and featurettes
-    ================================================== -->
-    <!-- Wrap the rest of the page in another container to center all the content. -->
-
     <div class="container marketing">
 
       <!-- Three columns of text below the carousel -->
-      <div class="row">
-        <div class="col-lg-12">
-	  <IMG SRC="imgs/site/loading_spinner.gif" id="mainimage" style="width: 100%"/>
-        </div><!-- /.col-lg-4 -->
-      </div><!-- /.row -->
+      <div class="row" style="margin-top: 50px;">
+        <div class="col-lg-3">
+		<ul id='photoInfo' class="fa-ul photoInfoList"></ul>
+	</div>
+        <div class="col-lg-9" id="photoMain">
+		<div id="loading" style="margin:auto;"><i class="fa fa-cog fa-spin"></i></div>
+        </div>
+      </div>
 
       <!-- FOOTER -->
       <footer>
@@ -103,10 +102,59 @@
 	})();
 
 	var id=urlParams['id'];
-	alert(id);
-	alert(id.slice(0,2));
-	$("#mainimage").attr('src',"http://imgs.thejml.info:789/"+id.slice(0,2)+"/"+id+"12801280000.jpg");
-	googleMapLocation();
+//512b2eca2e19d20acbc3e745cdcb0dfdd28fb3a0  http://elasticsearch-thejml.rhcloud.com/photos/name/
+	$.getJSON( "http://elasticsearch-thejml.rhcloud.com/photos/name/"+id, function( data ) {
+		var photoInfo=data._source;
+		var rot=orientationToDeg(photoInfo.Orientation);
+		$("<IMG>").attr('src',"http://images.thejml.info:789/"+id.slice(0,2)+"/"+id+"08000600"+rot+".jpg").appendTo("#photoMain");
+		$("#loading").hide();
+	//	$("#mainimage").attr('src',"http://images.thejml.info:789/"+id.slice(0,2)+"/"+id+"10241024"+rot+".jpg");
+		$('<li><i class="fa fa-file-image-o fa-fw"></i>&nbsp;'+photoInfo.FileName+'</li>').appendTo("#photoInfo");
+		$('<li><i class="fa fa-database fa-fw"></i>&nbsp;'+photoInfo.FileSize+' bytes</li>').appendTo("#photoInfo");
+		$('<li><i class="fa fa-camera fa-fw"></i>&nbsp;'+photoInfo.Make+" "+photoInfo.Model+'</li>').appendTo("#photoInfo");
+		$('<li><i class="fa fa-calendar fa-fw"></i>&nbsp;'+photoInfo.DateTimeOriginal+'</li>').appendTo("#photoInfo");
+
+/* Data Returned:
+{"FileName":"IMG_4494.JPG",
+"FileDateTime":1424922250,
+"FileSize":2165095,
+"MimeType":"image\/jpeg",
+"Make":"Apple",
+"Model":"iPhone_4S",
+"Orientation":1,
+"XResolution":72,
+"YResolution":72,
+"ResolutionUnit":2,
+"Software":"5.1.1",
+"DateTime":"2012-07-07T09:21:24.000Z",
+"ExposureTime":0.05,
+"FNumber":2.4,
+"ExposureProgram":2,
+"ISOSpeedRatings":200,
+"DateTimeOriginal":"2012:07:07 09:21:24",
+"DateTimeDigitized":"2012:07:07 09:21:24",
+"ShutterSpeedValue":4.3219284603421,
+"ApertureValue":2.5260688216893,
+"BrightnessValue":1.0198650674663,
+"MeteringMode":5,
+"Flash":16,
+"FocalLength":4.28,
+"ColorSpace":1,
+"ExifImageWidth":3264,
+"ExifImageLength":2448,
+"ExposureMode":0,
+"WhiteBalance":0,
+"GPSAltitudeRef":"\u0000",
+"GPSAltitude":34.511634844869,
+"GPSImgDirectionRef":"M",
+"GPSImgDirection":298.02285714286,
+"location":[37.2932,-76.67],
+"lastUpdate":1424922410116,
+"sha":"b9402680210d4c3dff21aa5bb17b8adddd71cde9",
+"tags":[]}
+*/
+	});
+//	googleMapLocation();
     </script>
   </body>
 </html>
